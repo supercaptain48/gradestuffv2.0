@@ -14,8 +14,9 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#2563eb"
+      },
+      "package": "com.supercaptain.gradestuff"
     },
     "web": {
       "bundler": "metro",
@@ -30,12 +31,21 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#2563eb"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8eda151a-5c11-4007-9e8e-c62dbd3a4216"
+      }
     }
   }
 }

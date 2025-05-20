@@ -83,22 +83,144 @@ export const findCumulativeWeighted = (data) => {
     let gpa = 0;
     let numOfClasses = 0;
 
-    data.transcript.map((schoolYear) => {
-        //THIS NEEDS TO BE CHANGED AS IT IS ONLY LOOKING AT TRANSCRIPT
-        schoolYear.courses.map((course) => {
-            let grade = Number(course.sem1Grade);
-            if(grade) {
-                total += findCumulativeWeightedScale(course.courseCode) - Math.round(100 - grade) / 10;
-                console.log(course.courseName + ": " + findCumulativeWeightedScale(course.courseCode))
-                numOfClasses++;
+    function calculateQuarter(quarter) {
+        quarter.map((course) => {
+            if(course.grade) {
+                if(Number(course.grade) > 0) {
+                    total += findWeightedScale(course.name) - Math.round(100 - Number(course.grade)) / 10;
+                    numOfClasses++;
+                }
             }
-            grade = Number(course.sem2Grade);
-            if(grade) {
-                total += findCumulativeWeightedScale(course.courseCode) - Math.round(100 - grade) / 10;
+        })
+    }
+
+    function calculateSemester(quarter1, quarter2) {
+        quarter2.map((course, index) => {
+            if(course.grade) {
+                const quarter1Grade = Math.round(Number(quarter1[index].grade));
+                const quarter2Grade = Math.round(Number(course.grade));
+
+                let average = 0;
+
+                if(course.grade > 0) {
+                    average = Math.round((quarter1Grade + quarter2Grade) / 2);
+                }
+                else {
+                    average = Math.round(quarter1Grade);
+                }
+                
+
+                total += findWeightedScale(course.name) - Math.round(100 - Number(average)) / 10;
                 numOfClasses++;
             }
         })
+    }
+
+    data.transcript.map((schoolYear) => {
+        //THIS NEEDS TO BE CHANGED AS IT IS ONLY LOOKING AT TRANSCRIPT
+        if(schoolYear.gradeLevel != data.student.grade) {
+            schoolYear.courses.map((course) => {
+                let grade = Number(course.sem1Grade);
+                if(grade) {
+                    total += findCumulativeWeightedScale(course.courseCode) - Math.round(100 - grade) / 10;
+                    numOfClasses++;
+                }
+                grade = Number(course.sem2Grade);
+                if(grade) {
+                    total += findCumulativeWeightedScale(course.courseCode) - Math.round(100 - grade) / 10;
+                    numOfClasses++;
+                }
+            })
+        }
     })
+
+    if(data.currentQuarter == 1) {
+        calculateQuarter(data.q1);
+    } else if(data.currentQuarter == 2) {
+        calculateSemester(data.q1, data.q2);
+    } else if(data.currentQuarter == 3) {
+        calculateSemester(data.q1, data.q2);
+        calculateQuarter(data.q3);
+    } else if(data.currentQuarter == 4) {
+        calculateSemester(data.q1, data.q2);
+        calculateSemester(data.q3, data.q4);
+    }
+
+    gpa = (total / numOfClasses).toFixed(3);
+    if(gpa) {
+        return gpa;
+    } else {
+        return 0.000;
+    }
+}
+
+export const findCumulativeUnweighted = (data) => {
+    let total = 0;
+    let gpa = 0;
+    let numOfClasses = 0;
+
+    function calculateQuarter(quarter) {
+        quarter.map((course) => {
+            if(course.grade) {
+                if(Number(course.grade) > 0) {
+                    total += findUnweightedScale(Number(course.grade));
+                    numOfClasses++;
+                }
+            }
+        })
+    }
+
+    function calculateSemester(quarter1, quarter2) {
+        quarter2.map((course, index) => {
+            if(course.grade) {
+                const quarter1Grade = Math.round(Number(quarter1[index].grade));
+                const quarter2Grade = Math.round(Number(course.grade));
+
+                let average = 0;
+
+                if(course.grade > 0) {
+                    average = Math.round((quarter1Grade + quarter2Grade) / 2);
+                }
+                else {
+                    average = Math.round(quarter1Grade);
+                }
+                
+
+                total += findUnweightedScale(Number(course.grade));
+                numOfClasses++;
+            }
+        })
+    }
+
+    data.transcript.map((schoolYear) => {
+        //THIS NEEDS TO BE CHANGED AS IT IS ONLY LOOKING AT TRANSCRIPT
+        if(schoolYear.gradeLevel != data.student.grade) {
+            schoolYear.courses.map((course) => {
+                let grade = Number(course.sem1Grade);
+                if(grade) {
+                    total += findUnweightedScale(grade);
+                    numOfClasses++;
+                }
+                grade = Number(course.sem2Grade);
+                if(grade) {
+                    total += findUnweightedScale(grade);
+                    numOfClasses++;
+                }
+            })
+        }
+    })
+
+    if(data.currentQuarter == 1) {
+        calculateQuarter(data.q1);
+    } else if(data.currentQuarter == 2) {
+        calculateSemester(data.q1, data.q2);
+    } else if(data.currentQuarter == 3) {
+        calculateSemester(data.q1, data.q2);
+        calculateQuarter(data.q3);
+    } else if(data.currentQuarter == 4) {
+        calculateSemester(data.q1, data.q2);
+        calculateSemester(data.q3, data.q4);
+    }
 
     gpa = (total / numOfClasses).toFixed(3);
     if(gpa) {

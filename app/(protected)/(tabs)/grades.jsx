@@ -2,6 +2,7 @@ import { FlatList, Text, View, TouchableOpacity, ActivityIndicator } from "react
 import { useState, useEffect, useCallback, useContext } from "react";
 import { router } from "expo-router";
 import { AppContext } from "../_layout";
+import { AuthContext } from "@/utils/authContext";
 
 const renderClass = ({ item }) => {
     const navigate = () => {
@@ -33,9 +34,10 @@ export default function Grades() {
     const [gradesData, setGradesData] = useState([]);
     const [quarter, setQuarter] = useState();
     const { data, setData } = useContext(AppContext);
+    const authContext = useContext(AuthContext);
 
     async function getGrades(q) {
-        const response = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=203499&password=superCaptain8!/${q ? `?quarter=${q}` : ""}`);
+        const response = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/${q ? `?quarter=${q}` : ""}`);
         const grades = await response.json();
         setLoading(false);
         !q && setGradesData(grades["grades"]);
