@@ -1,7 +1,8 @@
-import { useRouter } from "expo-router";
+import { SplashScreen, useRouter } from "expo-router";
 import { createContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { store } from "expo-router/build/global-state/router-store";
+
+SplashScreen.preventAutoHideAsync();
 
 const loginStorageKey = "loginState";
 
@@ -73,8 +74,14 @@ export function AuthProvider({ children }) {
         getLoginState();
     }, [])
 
+    useEffect(() => {
+        if (isReady) {
+            SplashScreen.hideAsync();
+        }
+    }, [isReady])
+
     return (
-        <AuthContext.Provider value={{ isReady, isLoggedIn, logIn, logOut, wrongCredentials, isLoading, username, password }}>
+        <AuthContext.Provider value={{ isReady, setIsReady, isLoggedIn, logIn, logOut, wrongCredentials, isLoading, username, password }}>
             {children}
         </AuthContext.Provider>
     )

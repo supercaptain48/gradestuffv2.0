@@ -1,0 +1,40 @@
+const IS_DEV = process.env.APP_VARIANT == 'development';
+const IS_PREVIEW = process.env.APP_VARIANT == 'preview';
+
+const getUniqueIdentifier = () => {
+  if (IS_DEV) {
+    return 'com.supercaptain.gradestuff.dev';
+  }
+
+  if (IS_PREVIEW) {
+    return 'com.supercaptain.gradestuff.preview';
+  }
+
+  return 'com.supercaptain.gradestuff';
+};
+
+const getAppName = () => {
+  if (IS_DEV) {
+    return 'Gradestuff (Dev)';
+  }
+
+  if (IS_PREVIEW) {
+    return 'Gradestuff (Preview)';
+  }
+
+  return 'Gradestuff';
+};
+
+
+export default ({ config }) => ({
+    ...config,
+    name: getAppName(),
+    ios: {
+        ...config.ios,
+        bundleIdentifier: getUniqueIdentifier(),
+    },
+    android: {
+        ...config.android,
+        package: getUniqueIdentifier(),
+    }
+});
