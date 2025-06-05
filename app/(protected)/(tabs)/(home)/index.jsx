@@ -58,7 +58,6 @@ export default function Index() {
             fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/`)
                 .then(response => response.json())
                 .then(quarterData => {
-                    console.log("Fetched Q4 data:", quarterData);
                     setData((prevData) => {
                         const updatedData = {
                             ...prevData,
