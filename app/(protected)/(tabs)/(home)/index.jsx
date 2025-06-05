@@ -34,6 +34,49 @@ export default function Index() {
         }
     }, []);
 
+    useEffect(() => {
+        async function fetchAssignments(quarter) {
+            if(!data[`q${quarter}`]) {
+                fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=${quarter}`)
+                    .then(response => response.json())
+                    .then(quarterData => {
+                        console.log(quarter)
+                        console.log(`Fetched Q${quarter} data:`, quarterData);
+                        setData((prevData) => {
+                            const updatedData = {
+                                ...prevData,
+                                [`q${quarter}`]: quarterData["grades"]
+                            };
+                            return updatedData;
+                        });
+                    })
+                    .catch(error => console.error(`Error fetching Q${quarter} data:`, error));
+            }
+        }
+
+        if(!data.currentQuarter) {
+            fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/`)
+                .then(response => response.json())
+                .then(quarterData => {
+                    console.log("Fetched Q4 data:", quarterData);
+                    setData((prevData) => {
+                        const updatedData = {
+                            ...prevData,
+                            [`q${quarterData["quarter"]}`]: quarterData["grades"],
+                            currentQuarter: quarterData["quarter"]
+                        };
+                        return updatedData;
+                    });
+                })
+                .catch(error => console.error("Error fetching Q4 data:", error));
+        }
+        let quarter = data.currentQuarter;
+        while(quarter > 0) {
+            fetchAssignments(quarter);
+            quarter--;
+        }
+    }, [])
+
     const name = studentData.name ? studentData.name.split(", ")[1] + " " + studentData.name.split(", ")[0] : "Student";
 
     return (

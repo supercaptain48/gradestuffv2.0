@@ -19,10 +19,10 @@ const getAppName = () => {
   }
 
   if (IS_PREVIEW) {
-    return 'Gradestuff (Preview)';
+    return 'gradestuff';
   }
 
-  return 'Gradestuff';
+  return 'gradestuff';
 };
 
 

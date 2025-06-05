@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, ScrollView, Text, View } from "react-native";
 import { AppContext } from "../../_layout";
 import { AuthContext } from "@/utils/authContext";
@@ -12,7 +12,7 @@ const RenderMarkingPeriod = ({ markingPeriod, courses }) => {
 
             {Object.entries(courses).map(([day, courses], index) => {
                 return (
-                    <>
+                    <React.Fragment key={index}>
                         <View className="bg-white rounded-3xl p-3 mb-2 border-2" key={index}>
                             <Text className="text-2xl font-bold text-center">{day} Day</Text>
                         </View>
@@ -20,7 +20,16 @@ const RenderMarkingPeriod = ({ markingPeriod, courses }) => {
                             // console.log(course)
                             return (
                                 <View className="bg-white rounded-3xl px-4 py-2 mb-2 flex-row items-center" key={course.courseName}>
-                                    <Text className="font-bold text-lg flex-1">{course.periods}: {course.courseName}</Text>
+                                    <View className="rounded-full w-12 items-center justify-center mr-2">
+                                        <Text className="text-2xl font-bold">{course.periods}{course.periods == "1" ? "st" :
+                                                                                                   course.periods == "2" ? "nd" :
+                                                                                                   course.periods == "3" ? "rd" : "th"}</Text>
+                                    </View>
+                                    
+                                    <View className="flex-1">
+                                        <Text className="font-bold text-lg">{course.courseName}</Text>
+                                        <Text className="text-gray-600">{course.teacher}</Text>
+                                    </View>
 
                                     <View className="bg-gray-300 rounded-2xl px-3 py-2">
                                         <Text className="font-bold">{course.room}</Text>
@@ -28,7 +37,7 @@ const RenderMarkingPeriod = ({ markingPeriod, courses }) => {
                                 </View>
                             )
                         })}
-                    </>
+                    </React.Fragment>
                     
                 )   
             })}
