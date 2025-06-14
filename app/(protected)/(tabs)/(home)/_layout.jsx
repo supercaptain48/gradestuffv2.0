@@ -6,6 +6,7 @@ export default function HomeLayout() {
         <Stack screenOptions={{header: Header}}>
             <Stack.Screen name="index" options={{ title: "Home" }} />
             <Stack.Screen name="schedule" options={{ title: "Schedule" }} />
+            <Stack.Screen name="transcript" options={{ title: "Transcript" }} />
         </Stack>
     )
 }

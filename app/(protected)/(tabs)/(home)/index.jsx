@@ -2,7 +2,7 @@ import { Text, View, ActivityIndicator, TouchableOpacity } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../_layout";
 import { AuthContext } from "@/utils/authContext";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 
 export default function Index() {
     const [isLoading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export default function Index() {
         }
     }, []);
 
-    useEffect(() => {
+    useFocusEffect(() => {
         async function fetchAssignments(quarter) {
             if(!data[`q${quarter}`]) {
                 fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=${quarter}`)
@@ -74,7 +74,7 @@ export default function Index() {
             fetchAssignments(quarter);
             quarter--;
         }
-    }, [])
+    })
 
     const name = studentData.name ? studentData.name.split(", ")[1] + " " + studentData.name.split(", ")[0] : "Student";
 
@@ -83,11 +83,11 @@ export default function Index() {
             {isLoading ? <ActivityIndicator size="large" /> : 
                 <View>
                     <Text className="font-bold text-4xl">Hello, {name}</Text>
-                    <Text>No updates to show</Text>
+                    <Text className="my-8">No updates to show (THIS FEATURE IS CURRENTLY UNDER DEVELOPMENT)</Text>
                     <TouchableOpacity className="py-4 px-8 bg-blue-600 rounded-3xl mt-4" activeOpacity={0.7} onPress={() => router.push("/schedule")}>
                         <Text className="text-white font-bold text-xl">View Schedule</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity className="py-4 px-8 bg-blue-600 rounded-3xl mt-4" activeOpacity={0.7}>
+                    <TouchableOpacity className="py-4 px-8 bg-blue-600 rounded-3xl mt-4" activeOpacity={0.7} onPress={() => router.push("/transcript")}>
                         <Text className="text-white font-bold text-xl">View Transcript</Text>
                     </TouchableOpacity>
                 </View>

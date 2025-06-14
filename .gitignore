@@ -35,4 +35,8 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# private key
+gradestuffv2-firebase-adminsdk-fbsvc-dfabd7f305.json
+google-services.json
+
 app-example

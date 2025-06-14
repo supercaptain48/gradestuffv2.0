@@ -274,7 +274,7 @@ export const findCumulativeWeighted = (data) => {
 
     //console.log(JSON.stringify(data.credits))
 
-    data.transcript.map((schoolYear) => {
+    data.transcript.slice(1).map((schoolYear) => {
         if(schoolYear.gradeLevel != data.student.grade) {
             weightedScales.push({gradeLevel: schoolYear.gradeLevel, courses: []});
             credits.push({gradeLevel: schoolYear.gradeLevel, credits: []});
@@ -416,7 +416,7 @@ export const findCumulativeUnweighted = (data) => {
         })
     }
 
-    data.transcript.map((schoolYear) => {
+    data.transcript.slice(1).map((schoolYear) => {
         //THIS NEEDS TO BE CHANGED AS IT IS ONLY LOOKING AT TRANSCRIPT
         if(schoolYear.gradeLevel != data.student.grade) {
             schoolYear.courses.map((course) => {

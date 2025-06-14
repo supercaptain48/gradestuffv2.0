@@ -14,9 +14,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png",
         "backgroundColor": "#2563eb"
       },
-      "package": "com.supercaptain.gradestuff"
+      "package": "com.supercaptain.gradestuff",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",

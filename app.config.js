@@ -7,7 +7,7 @@ const getUniqueIdentifier = () => {
   }
 
   if (IS_PREVIEW) {
-    return 'com.supercaptain.gradestuff.preview';
+    return 'com.supercaptain.gradestuff';
   }
 
   return 'com.supercaptain.gradestuff';
