@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AppContext } from "../../_layout";
 import { AuthContext } from "@/utils/authContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const RenderMarkingPeriod = ({ markingPeriod, courses }) => {
     return (
@@ -96,7 +97,7 @@ export default function Schedule() {
 
     return (
         <View className="flex-1 px-4">
-            {isLoading ? <ActivityIndicator size='large' /> : scheduleKeys.length > 0 &&
+            {isLoading ? <ActivityIndicator size='large' /> : scheduleKeys.length > 0 ?
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {scheduleKeys.map((markingPeriod) => (
                         <RenderMarkingPeriod 
@@ -105,7 +106,24 @@ export default function Schedule() {
                             courses={scheduleData[markingPeriod]} 
                         />
                     ))}
-                </ScrollView>
+                </ScrollView> :
+                <View className="flex-1 items-center justify-center p-4">
+                    <View className="bg-white rounded-2xl p-4 items-center">
+                        <Ionicons name="alert-circle" size={28} color={"red"} />
+                        <Text className="text-center font-bold text-xl my-2">Unable to load schedule. This may be because they are unavailable in HAC.</Text>
+                        <Ionicons name="alert-circle" size={28} color={"red"} />
+                        <TouchableOpacity 
+                            className="bg-blue-600 px-12 py-2 mt-2 rounded-2xl" 
+                            activeOpacity={0.7} 
+                            onPress={() => {
+                                setLoading(true)
+                                fetchSchedule()
+                            }}
+                        >
+                            <Text className="font-bold text-white text-xl">Try Again</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             }
         </View>
     )

@@ -3,12 +3,13 @@ import { useState, useEffect, useCallback, useContext } from "react";
 import { router } from "expo-router";
 import { AppContext } from "../_layout";
 import { AuthContext } from "@/utils/authContext";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-const renderClass = ({ item }) => {
+const RenderClass = ({ item, index, quarter }) => {
     const navigate = () => {
         router.navigate({
             pathname: `courseDetails/${item.name.replace("/", ".")}`,
-            params: {data: JSON.stringify(item)}
+            params: {data: JSON.stringify(item), index: index, quarter: quarter}
         })
     }
 
@@ -38,22 +39,36 @@ export default function Grades() {
 
     async function getGrades(q) {
         const response = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/${q ? `?quarter=${q}` : ""}`);
-        const grades = await response.json();
-        setLoading(false);
-        !q && setGradesData(grades["grades"]);
-        !q && setQuarter(Number(grades["quarter"]));
-        setData((prevData) => {
-            const updatedData = {
-                ...prevData,
-                [`q${grades["quarter"]}`]: grades["grades"],
-            };
+        if(response.ok) {
+            const grades = await response.json();
+            setLoading(false);
+            !q && setGradesData(grades["grades"]);
+            !q && setQuarter(Number(grades["quarter"]));
+            setData((prevData) => {
+                const updatedData = {
+                    ...prevData,
+                    [`q${grades["quarter"]}`]: grades["grades"],
+                    weights: grades["weights"],
+                };
 
-            if(!q) {
-                updatedData.currentQuarter = grades["quarter"];
-            }
+                if(!q) {
+                    updatedData.currentQuarter = grades["quarter"];
+                }
 
-            return updatedData;
-        });
+                return updatedData;
+            });
+        }
+        else {
+            setData((prevData) => {
+                const updatedData = {
+                    ...prevData,
+                    currentQuarter: 0,
+                }
+
+                return updatedData;
+            })
+            setLoading(false)
+        }
     }
 
     const renderQuarter = (isQuarter, index) => {
@@ -73,19 +88,41 @@ export default function Grades() {
             <TouchableOpacity 
                 className={`flex-1 ${isQuarter && "bg-white rounded-2xl"}`} 
                 key={index} 
-                onPress={handlePress}>
+                onPress={() => {
+                    setQuarter(index + 1);
+
+                    if(data[`q${index + 1}`]) {
+                        setLoading(false);
+                        setGradesData(data[`q${index + 1}`]);
+                    } else {
+                        setLoading(true);
+                        getGrades(index + 1);
+                    }
+                }}>
                 <Text className={`text-center font-bold ${isQuarter ? "text-black rounded-2xl" : "text-white"}`}>Q{index + 1}</Text>
             </TouchableOpacity>
         )
     }
 
     useEffect(() => {
-        data.currentQuarter ? (setLoading(false), setQuarter(data.currentQuarter)) : getGrades();
+        data.currentQuarter !== undefined ? (console.log(data.currentQuarter), setLoading(false), setQuarter(data.currentQuarter)) : getGrades();
     }, []);
 
     useEffect(() => {
         setGradesData(data[`q${quarter}`]);
     })
+
+    useEffect(() => {
+        if(data.currentQuarter >= 0) {
+            setQuarter(data.currentQuarter)
+            setLoading(false)
+        }
+        if (data[`q${data.currentQuarter}`]) {
+            setGradesData(data[`q${data.currentQuarter}`]);
+            setQuarter(data.currentQuarter);
+            setLoading(false);
+        }
+    }, [data.currentQuarter])
 
     const quarters = [false, false, false, false]
 
@@ -93,18 +130,41 @@ export default function Grades() {
 
     return (
         <View className="flex-1">
-            <View className="flex flex-row bg-blue-600 pt-6 rounded-b-2xl pb-2 px-2" style={{marginTop: -20}}>
-                {quarters.map(renderQuarter)}
-            </View>
+            {data.currentQuarter > 0 ? 
+                <View className="bg-blue-600 pt-6 rounded-b-2xl pb-2 px-2" style={{marginTop: -20}}>
+                    {/* <Text className="text-white text-center font-bold mb-4 text-lg">Prediction mode</Text> */}
+                    <View className="flex flex-row">
+                        {quarters.map(renderQuarter)}
+                    </View>
+                </View> : 
+            <View></View>}
 
             {isLoading ? <ActivityIndicator size="large" /> : 
-                <FlatList 
-                    data={gradesData} 
-                    renderItem={renderClass} 
-                    keyExtractor={(item) => item.name}
-                    showsVerticalScrollIndicator={false}
-                    className="mx-4"
-                />}
+                data.currentQuarter == 0 ? 
+                    <View className="flex-1 items-center justify-center p-4">
+                        <View className="bg-white rounded-2xl p-4 items-center">
+                            <Ionicons name="alert-circle" size={28} color={"red"} />
+                            <Text className="text-center font-bold text-xl my-2">Unable to load grades. This may be because they are unavailable in HAC.</Text>
+                            <Ionicons name="alert-circle" size={28} color={"red"} />
+                            <TouchableOpacity 
+                                className="bg-blue-600 px-12 py-2 mt-2 rounded-2xl" 
+                                activeOpacity={0.7} 
+                                onPress={() => {
+                                    setLoading(true)
+                                    getGrades()
+                                }}
+                            >
+                                <Text className="font-bold text-white text-xl">Try Again</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View> :
+                    <FlatList 
+                        data={gradesData} 
+                        renderItem={({ item, index }) => <RenderClass item={item} index={index} quarter={quarter} />}
+                        keyExtractor={(item) => item.name}
+                        showsVerticalScrollIndicator={false}
+                        className="mx-4"
+                    />}
         </View>
     )
 }

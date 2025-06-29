@@ -29,31 +29,59 @@ export default function Gpa() {
     const [isGpaLoaded, setIsGpaLoaded] = useState(false);
 
     async function getAllGrades() {
-        const [q1Res, q2Res, q3Res, q4Res, transcriptRes] = await Promise.all([
-            fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=1`),
-            fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=2`),
-            fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=3`),
-            fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=4`),
-            fetch(`https://vercel-gradestuff-backend.vercel.app/transcript-username=${authContext.username}&password=${authContext.password}/`)
-        ])
+        let quarter = 1;
+        while(quarter < 5) {
+            if(!data[`q${quarter}`]) {
+                const res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=${quarter}`);
+                if(res.ok) {
+                    const actual = await res.json();
+                    setData((prevData) => {
+                        const updatedData = {
+                            ...prevData,
+                            [`q${quarter}`]: actual["grades"]
+                        }
+                        return updatedData;
+                    })
+                }
+            }
+            console.log("just checking bruh")
+            quarter++;
+        }
 
-        const [q1, q2, q3, q4, transcript] = await Promise.all([
-            q1Res.json(),
-            q2Res.json(),
-            q3Res.json(),
-            q4Res.json(),
-            transcriptRes.json()
-        ])
+        if(!data.transcript) {
+            const res = await fetch(`https://vercel-gradestuff-backend.vercel.app/transcript-username=${authContext.username}&password=${authContext.password}/`);
+            const transcript = await res.json();
+            setData((prevData) => {
+                const updatedData = {
+                    ...prevData,
+                    transcript: transcript
+                }
+                return updatedData;
+            })
+        }
+        // const q1Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=1`);
+        // const q2Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=2`);
+        // const q3Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=3`);
+        // const q4Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=4`);
+        // const transcriptRes = await fetch(`https://vercel-gradestuff-backend.vercel.app/transcript-username=${authContext.username}&password=${authContext.password}/`);
+
+        // console.log(q1Res)
+
+        // const [q1, q2, q3, q4, transcript] = await Promise.all([
+        //     q1Res.json(),
+        //     q2Res.json(),
+        //     q3Res.json(),
+        //     q4Res.json(),
+        //     transcriptRes.json()
+        // ])
+
+        console.log("not here tho?")
 
         setData((prevData) => {
             const updatedData = {
                 ...prevData,
-                q1: q1["grades"],
-                q2: q2["grades"],
-                q3: q3["grades"],
-                q4: q4["grades"],
-                transcript: transcript,
-                currentQuarter: q4 ? 4 : q3 ? 3 : q2 ? 2 : 1,
+                gpaLoaded: true,
+                currentQuarter: prevData.q4 ? 4 : prevData.q3 ? 3 : prevData.q2 ? 2 : prevData.q1 ? 1 : 0
             };
             return updatedData;
         });
@@ -80,7 +108,7 @@ export default function Gpa() {
             }
         }
 
-        if(data.q1 && data.q2 && data.q3 && data.q4 && data.transcript) {
+        if(data.gpaLoaded) {
             setLoadingGrades(false);
         }
 
@@ -107,10 +135,15 @@ export default function Gpa() {
 
             setCumulativeUnweighted(findCumulativeUnweighted(data));
 
-            const weighted = findCurrentWeighted(data);
-            setCurrentWeighted(weighted);
-
-            setCurrentUnweighted(findCurrentUnweighted(data));
+            if(data[`q${data.currentQuarter}`]) {
+                const weighted = findCurrentWeighted(data);
+                setCurrentWeighted(weighted);
+                setCurrentUnweighted(findCurrentUnweighted(data));
+            } else{
+                setCurrentWeighted("0.000");
+                setCurrentUnweighted("0.000");
+            }
+        
 
             // add the gpa scales to the data
             if(!data.scales || !data.credits) {
@@ -149,13 +182,13 @@ export default function Gpa() {
             }
             {!isLoadingGrades && 
                 <TouchableOpacity 
-                    className="bg-gray-300 rounded-3xl px-4 py-4 mt-8 mx-4" 
+                    className="bg-gray-300 rounded-3xl px-4 py-2 mt-8 mx-4" 
                     onPress={() => {
                         router.replace("editGpa/editScales");
                     }}
                     activeOpacity={0.7}
                 >
-                    <Text className="font-bold text-2xl">Edit GPA scales</Text>
+                    <Text className="font-bold text-2xl text-center">Edit GPA scales and credits</Text>
                 </TouchableOpacity>
             }
         </View>

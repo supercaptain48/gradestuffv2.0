@@ -347,8 +347,13 @@ export const findCumulativeWeighted = (data) => {
     // if the scales are already present, then return the existing scales and credits so it remains unchanged 
     // (if scales are present, that means credits are also present)
     if(data.scales) {
-        weightedScales = data.scales;
-        credits = data.credits;
+        // even if scales are present, we still need to check whether the last item in the scales are the same as the scales which was just calculated
+        // (after the schoolyear, the names of the courses will change as they are removed from current grades and found in transcript)
+        // this is checked by comparing the name of the first course present in each set of scales
+        if(data.scales.at(-1).courses[0].name == weightedScales.at(-1).courses[0].name) {
+            weightedScales = data.scales;
+            credits = data.credits;
+        }
     }
 
     gpa = (total / numOfClasses).toFixed(3);
