@@ -137,8 +137,15 @@ export default function Gpa() {
 
             if(data[`q${data.currentQuarter}`]) {
                 const weighted = findCurrentWeighted(data);
-                setCurrentWeighted(weighted);
-                setCurrentUnweighted(findCurrentUnweighted(data));
+                console.log(weighted)
+                if (isNaN(weighted)) {
+                    setCurrentWeighted("0.000");
+                    setCurrentUnweighted("0.000");
+                }
+                else {
+                    setCurrentWeighted(weighted);
+                    setCurrentUnweighted(findCurrentUnweighted(data));
+                }
             } else{
                 setCurrentWeighted("0.000");
                 setCurrentUnweighted("0.000");

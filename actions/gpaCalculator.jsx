@@ -140,7 +140,7 @@ export const findCumulativeWeighted = (data) => {
         let scalesIndex = weightedScales.findIndex((year) => year.gradeLevel == data.student.grade);
         if(scalesIndex == -1) {
             weightedScales.push({gradeLevel: data.student.grade, courses: []});
-            index = weightedScales.length - 1;
+            scalesIndex = weightedScales.length - 1;
         }
 
         // add the current grade level to the credits list if it does not already exist
@@ -333,6 +333,7 @@ export const findCumulativeWeighted = (data) => {
     })
 
     if(data.currentQuarter == 1) {
+        console.log("Calculating quarter 1")
         calculateQuarter(data.q1);
     } else if(data.currentQuarter == 2) {
         calculateSemester(data.q1, data.q2);
@@ -350,7 +351,8 @@ export const findCumulativeWeighted = (data) => {
         // even if scales are present, we still need to check whether the last item in the scales are the same as the scales which was just calculated
         // (after the schoolyear, the names of the courses will change as they are removed from current grades and found in transcript)
         // this is checked by comparing the name of the first course present in each set of scales
-        if(data.scales.at(-1).courses[0].name == weightedScales.at(-1).courses[0].name) {
+        
+        if(data.scales.at(-1).courses[0]?.name == weightedScales.at(-1).courses[0]?.name) {
             weightedScales = data.scales;
             credits = data.credits;
         }

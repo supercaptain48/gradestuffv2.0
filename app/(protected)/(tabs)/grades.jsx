@@ -72,7 +72,7 @@ export default function Grades() {
     }
 
     const renderQuarter = (isQuarter, index) => {
-        const handlePress = useCallback(() => {
+        const handlePress = () => {
             setQuarter(index + 1);
 
             if(data[`q${index + 1}`]) {
@@ -82,23 +82,13 @@ export default function Grades() {
                 setLoading(true);
                 getGrades(index + 1);
             }
-        }, [index, data])
+        }
 
         return (
             <TouchableOpacity 
                 className={`flex-1 ${isQuarter && "bg-white rounded-2xl"}`} 
                 key={index} 
-                onPress={() => {
-                    setQuarter(index + 1);
-
-                    if(data[`q${index + 1}`]) {
-                        setLoading(false);
-                        setGradesData(data[`q${index + 1}`]);
-                    } else {
-                        setLoading(true);
-                        getGrades(index + 1);
-                    }
-                }}>
+                onPress={() => handlePress()}>
                 <Text className={`text-center font-bold ${isQuarter ? "text-black rounded-2xl" : "text-white"}`}>Q{index + 1}</Text>
             </TouchableOpacity>
         )

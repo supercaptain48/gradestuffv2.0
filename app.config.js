@@ -3,7 +3,7 @@ const IS_PREVIEW = process.env.APP_VARIANT == 'preview';
 
 const getUniqueIdentifier = () => {
   if (IS_DEV) {
-    return 'com.supercaptain.gradestuff.dev';
+    return 'com.supercaptain.gradestuff';
   }
 
   if (IS_PREVIEW) {

@@ -49,12 +49,13 @@ export default function Index() {
                     const response = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/${quarter ? `?quarter=${quarter}` : ""}`)
                     if(response.ok) {
                         const quarterData = await response.json()
-                        console.log(quarter)
-                        console.log(`Fetched Q${quarter} data:`, quarterData);
+                        responseQuarter = quarterData["quarter"];
+                        console.log(responseQuarter)
+                        console.log(`Fetched Q${responseQuarter} data:`, quarterData);
                         setData((prevData) => {
                             const updatedData = {
                                 ...prevData,
-                                [`q${quarter}`]: quarterData["grades"]
+                                [`q${responseQuarter}`]: quarterData["grades"]
                             };
 
                             if(!quarter) {
