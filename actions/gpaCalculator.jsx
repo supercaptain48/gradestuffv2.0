@@ -49,7 +49,6 @@ export const findCurrentWeighted = (data) => {
     //     weightedScales.push({gradeLevel: data.student.grade, courses: []});
     //     index = weightedScales.length - 1;
     // }
-
     data[`q${data.currentQuarter}`].map((course) => {
         let scale = findWeightedScale(course.name);
         // if the scales already exist, then use the existing scale
@@ -322,8 +321,7 @@ export const findCumulativeWeighted = (data) => {
                 if(sem1Grade && sem2Grade) {
                     total += (scale - Math.round(100 - sem1Grade) / 10) * (credit / 2);
                     total += (scale - Math.round(100 - sem2Grade) / 10) * (credit / 2);
-                    numOfClasses += 0.5;
-                    numOfClasses += 0.5;
+                    numOfClasses += credit;
                 } else {
                     total += (scale - Math.round(100 - sem1Grade) / 10) * credit;
                     numOfClasses += credit;

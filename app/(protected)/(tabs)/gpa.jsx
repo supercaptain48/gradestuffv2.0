@@ -30,7 +30,23 @@ export default function Gpa() {
 
     async function getAllGrades() {
         let quarter = 1;
-        while(quarter < 5) {
+        if (!data.currentQuarter) {
+            const res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/`);
+            const actual = await res.json();
+            quarter = actual.quarter - 1;
+            setData((prevData) => {
+                const updatedData = {
+                    ...prevData,
+                    [`q${actual.quarter}`]: actual["grades"],
+                    currentQuarter: actual.quarter,
+                }
+                return updatedData;
+            })
+        } else {
+            quarter = data.currentQuarter - 1;
+        }
+
+        while(quarter > 0) {
             if(!data[`q${quarter}`]) {
                 const res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=${quarter}`);
                 if(res.ok) {
@@ -44,8 +60,8 @@ export default function Gpa() {
                     })
                 }
             }
-            console.log("just checking bruh")
-            quarter++;
+            console.log("just checking bruh");
+            quarter--;
         }
 
         if(!data.transcript) {
@@ -59,21 +75,6 @@ export default function Gpa() {
                 return updatedData;
             })
         }
-        // const q1Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=1`);
-        // const q2Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=2`);
-        // const q3Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=3`);
-        // const q4Res = await fetch(`https://vercel-gradestuff-backend.vercel.app/assignments-username=${authContext.username}&password=${authContext.password}/?quarter=4`);
-        // const transcriptRes = await fetch(`https://vercel-gradestuff-backend.vercel.app/transcript-username=${authContext.username}&password=${authContext.password}/`);
-
-        // console.log(q1Res)
-
-        // const [q1, q2, q3, q4, transcript] = await Promise.all([
-        //     q1Res.json(),
-        //     q2Res.json(),
-        //     q3Res.json(),
-        //     q4Res.json(),
-        //     transcriptRes.json()
-        // ])
 
         console.log("not here tho?")
 
@@ -137,7 +138,6 @@ export default function Gpa() {
 
             if(data[`q${data.currentQuarter}`]) {
                 const weighted = findCurrentWeighted(data);
-                console.log(weighted)
                 if (isNaN(weighted)) {
                     setCurrentWeighted("0.000");
                     setCurrentUnweighted("0.000");

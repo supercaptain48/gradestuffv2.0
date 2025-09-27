@@ -117,6 +117,18 @@ export default function GradeLevel() {
             <Stack.Screen options={{title: `Grade: ${gradeLevel}`}} />
             <FlatList 
                 data={componentsData}
+                ListHeaderComponent={() => {
+                    return (
+                        <>
+                            <View className="mt-4 mb-2 bg-white rounded-2xl items-center justify-center px-4 py-2">
+                                <Text className="text-center font-bold">Tap on Scale or Credit to edit</Text>
+                            </View>
+                            <View className="mb-2 bg-white rounded-2xl items-center justify-center px-4 py-2">
+                                <Text className="text-center font-bold text-sm">To exclude a course from GPA calculation, set it's credit to 0</Text>
+                            </View>
+                        </>
+                    )
+                }}
                 renderItem={({ item, index }) => {
                     return (
                         <CourseComponent
